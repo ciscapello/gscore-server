@@ -1,32 +1,20 @@
 import mongoose, { Model } from 'mongoose';
 
 export interface IProducts {
+  sitesCount: number;
   name: string;
-  description?: string;
-  price: string;
-  in_stock: boolean;
-  images?: string[];
+  prices: [{ price: string }];
 }
 
 type ProductsModel = Model<IProducts, {}>;
 
 const productsSchema = new mongoose.Schema<IProducts, ProductsModel>(
   {
-    name: {
-      type: String,
-      required: [true, 'Name is required field'],
-      unique: true
+    sitesCount: {
+      type: Number
     },
-    description: String,
-    price: {
-      type: String,
-      required: [true, 'Price is required field']
-    },
-    in_stock: {
-      type: Boolean,
-      default: false
-    },
-    images: [String]
+    name: String,
+    prices: [{ String }]
   },
   {
     versionKey: false

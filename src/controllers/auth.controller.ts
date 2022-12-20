@@ -12,28 +12,17 @@ const signToken = (id: Types.ObjectId) => {
 };
 
 const createSendToken = (
-  user: { name: string; email: string; _id: Types.ObjectId },
+  user: { username: string; email: string; _id: Types.ObjectId },
   statusCode: number,
   res: Response
 ) => {
   const token = signToken(user._id);
 
-  const cookieOptions = {
-    expires: new Date(Date.now() + Number(process.env.JWT_COOKIE_EXPIRES_IN) * 24 * 60 * 60 * 1000),
-    httpOnly: true,
-    secure: false
-  };
-  if (process.env.NODE_ENV === 'production') {
-    cookieOptions.secure = true;
-  }
-
-  res.cookie('jwt', token, cookieOptions);
-
   res.status(statusCode).json({
     status: 'success',
     token,
-    data: {
-      name: user.name,
+    user: {
+      name: user.username,
       email: user.email,
       id: user._id
     }
@@ -41,11 +30,11 @@ const createSendToken = (
 };
 
 export const signUp = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  console.log('TUTUTUTU');
   const newUser = await Users.create({
-    name: req.body.name,
+    username: req.body.username,
     email: req.body.email,
-    password: req.body.password,
-    confirm_password: req.body.confirm_password
+    password: req.body.password
   });
 
   createSendToken(newUser, 201, res);
@@ -73,8 +62,6 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
     console.log(req.cookies);
-  } else if (req.cookies.jwt) {
-    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -83,6 +70,7 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET!);
   console.log(decoded);
+  req.body = { ...req.body, id: (<any>decoded).id };
 
   const currentUser = await Users.findById((<any>decoded).id);
   if (!currentUser) {

@@ -4,8 +4,9 @@ import Products from '../models/products.model.js';
 import catchAsync from '../utils/catchAsync.js';
 import AppError from '../utils/appError.js';
 import { IProducts } from '../models/products.model.js';
+import Pricing from '../models/pricing.model.js';
 
-export const getAllProducts = catchAsync(async (req: Request, res: Response) => {
+export const getProducts = catchAsync(async (req: Request, res: Response) => {
   const products = await Products.find();
   res.status(200).json({
     status: 'success',
@@ -14,28 +15,11 @@ export const getAllProducts = catchAsync(async (req: Request, res: Response) => 
   });
 });
 
-export const getProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  let product;
-  if (mongoose.Types.ObjectId.isValid(req.params.id)) {
-    product = await Products.findById(req.params.id);
-  }
-  if (!product) {
-    return next(new AppError('There is no product with this ID', 400));
-  }
+export const getPricing = catchAsync(async (req: Request, res: Response) => {
+  const pricing = await Pricing.find();
   res.status(200).json({
     status: 'success',
-    body: product
-  });
-});
-
-export const createProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  if (!req.files) {
-    return next(new AppError('You should provide at least one image', 400));
-  }
-  const newProduct = await Products.create(req.body);
-  res.status(200).json({
-    status: 'success',
-    data: { newProduct }
+    body: pricing
   });
 });
 
@@ -56,8 +40,6 @@ export const updateProduct = catchAsync(async (req: Request, res: Response, next
   let product: IProducts | null = null;
   let oldImages;
   if (mongoose.Types.ObjectId.isValid(req.params.id)) {
-    let oldProduct = await Products.findById(req.params.id);
-    oldImages = oldProduct?.images;
     product = await Products.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true

@@ -2,7 +2,7 @@ import mongoose, { Model } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 interface User {
-  name: string;
+  username: string;
   email: string;
   role: string;
   password: string;
@@ -17,7 +17,7 @@ type UserModel = Model<User, {}, UserMethods>;
 
 const usersSchema = new mongoose.Schema<User, UserModel, UserMethods>(
   {
-    name: {
+    username: {
       type: String,
       required: [true, 'Name is required field'],
       unique: false
@@ -33,23 +33,6 @@ const usersSchema = new mongoose.Schema<User, UserModel, UserMethods>(
       select: false,
       minlength: 8,
       maxlength: 160
-    },
-    confirm_password: {
-      type: String,
-      required: [true, 'Confirm password please'],
-      select: false,
-      validate: {
-        validator: function (val: string) {
-          return val === this.password;
-        },
-        message: 'Password is not the same'
-      }
-    },
-    role: {
-      type: String,
-      enum: ['admin', 'user'],
-      default: 'user',
-      select: false
     }
   },
   {
@@ -65,10 +48,6 @@ usersSchema.pre('save', async function (next) {
   next();
 });
 
-usersSchema.post('save', async function (next) {
-  this.confirm_password = '';
-});
-
 usersSchema.methods.correctPassword = async function (
   candidatePassword: string,
   userPassword: string
@@ -76,6 +55,6 @@ usersSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-const Users = mongoose.model<User, UserModel>('Users', usersSchema);
+const Users = mongoose.model<User, UserModel>('Users', usersSchema, 'users');
 
 export default Users;
