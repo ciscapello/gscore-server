@@ -15,7 +15,7 @@ const codesSchema = new mongoose.Schema<Code, CodesModel>(
     status: {
       type: String,
       enum: ['ACTIVE', 'INACTIVE', 'HOLD'],
-      default: 'ACTIVE'
+      default: 'INACTIVE'
     },
     subscribeId: { type: Schema.Types.ObjectId, ref: 'Subscribes' },
     userId: { type: Schema.Types.ObjectId, ref: 'Users' }

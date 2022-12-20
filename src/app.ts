@@ -9,7 +9,6 @@ import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
 import xss from 'xss-clean';
 import cors from 'cors';
-import cookieParser from 'cookie-parser';
 
 const app = express();
 
@@ -18,7 +17,6 @@ helmet({
   crossOriginResourcePolicy: false,
   crossOriginEmbedderPolicy: false
 });
-app.use(cookieParser());
 
 app.use(express.json({ limit: '10kb' }));
 

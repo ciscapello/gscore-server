@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import Products from '../models/products.model.js';
 import catchAsync from '../utils/catchAsync.js';
-import Pricing from '../models/pricing.model.js';
 import AppError from '../utils/appError.js';
 import Subscribes from '../models/subscribes.model.js';
 import Codes from '../models/codes.model.js';
@@ -23,7 +22,8 @@ export const buyProduct = catchAsync(async (req: Request, res: Response, next: N
     userId,
     productId,
     currentPeriodStart,
-    currentPeriodEnd
+    currentPeriodEnd,
+    sitesCount
   });
 
   const codes = codeGenerator(sitesCount, newSubscribe.id, userId);
@@ -60,3 +60,77 @@ export const getSubscribes = catchAsync(async (req: Request, res: Response, next
     data: subscribes
   });
 });
+
+export const activateCode = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const code = req.body.code;
+  const newCode = await Codes.findOneAndUpdate({ code }, { status: 'ACTIVE' }, { new: true });
+  res.status(200).json({
+    status: 'success',
+    data: newCode
+  });
+});
+
+export const changeProduct = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+  const { productId, subscribeId } = req.body;
+  const oldSubscribe = await Subscribes.findById(subscribeId);
+  const product = await Products.findById(productId);
+
+  if (!oldSubscribe || !product) {
+    return next(new AppError('You should enter valid ids', 404));
+  }
+
+  let subscribes = await Subscribes.findByIdAndUpdate(
+    subscribeId,
+    {
+      sitesCount: product.sitesCount,
+      productId: product._id
+    },
+    { new: true }
+  );
+
+  let codes;
+  console.log(oldSubscribe.sitesCount, product.sitesCount);
+  const newCodes = codeGenerator(
+    product.sitesCount - oldSubscribe.sitesCount,
+    subscribeId,
+    req.body.id
+  );
+
+  if (!newCodes) {
+    await Codes.updateMany({ subscribeId }, { status: 'HOLD' }, { new: true });
+    console.log(codes);
+    codes = await Codes.find({ subscribeId: subscribeId });
+  } else {
+    await Codes.insertMany(newCodes);
+    codes = await Codes.find({ subscribeId: subscribeId });
+    console.log(codes);
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      subscribes,
+      codes
+    }
+  });
+});
+
+export const activateHoldedCodes = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const { codeIds, subscribeId } = req.body;
+
+    await Codes.updateMany(
+      {
+        _id: { $in: codeIds }
+      },
+      { status: 'INACTIVE' }
+    );
+
+    await Codes.deleteMany({ subscribeId: subscribeId, status: 'HOLD' });
+
+    res.status(200).json({
+      status: 'success',
+      data: {}
+    });
+  }
+);

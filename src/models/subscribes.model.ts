@@ -8,6 +8,7 @@ interface Subscribe {
   currentPeriodEnd: Date;
   status: string;
   codes?: Code[];
+  sitesCount: number;
 }
 
 type SubscribeModel = Model<Subscribe, {}>;
@@ -21,6 +22,9 @@ const subscribesSchema = new mongoose.Schema<Subscribe, SubscribeModel>(
     status: {
       type: String,
       default: 'ACTIVE'
+    },
+    sitesCount: {
+      type: Number
     }
   },
   {
