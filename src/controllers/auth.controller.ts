@@ -30,7 +30,6 @@ const createSendToken = (
 };
 
 export const signUp = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  console.log('TUTUTUTU');
   if (await Users.findOne({ email: req.body.email })) {
     return next(new AppError('Email is already exists, enter another email', 400));
   }
@@ -64,7 +63,6 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     token = req.headers.authorization.split(' ')[1];
-    console.log(req.cookies);
   }
 
   if (!token) {
@@ -72,7 +70,6 @@ export const protect = catchAsync(async (req: Request, res: Response, next: Next
   }
 
   const decoded = jwt.verify(token, process.env.JWT_SECRET!);
-  console.log(decoded);
   req.body = { ...req.body, id: (<any>decoded).id };
 
   const currentUser = await Users.findById((<any>decoded).id);

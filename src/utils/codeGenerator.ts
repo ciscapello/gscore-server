@@ -9,7 +9,6 @@ export const codeGenerator = (
 ): Code[] | undefined => {
   if (count <= 0) return;
   const res: Code[] = [];
-  console.log(count);
   for (let i = count; i > 0; i--) {
     res.push({
       code: uuidv4(),
@@ -17,6 +16,5 @@ export const codeGenerator = (
       userId
     });
   }
-  console.log('codes', res);
   return res;
 };

@@ -13,7 +13,6 @@ const handleCastErrorDB = (err: AppError) => {
 };
 
 const handleDuplicateFieldsDB = (err: AppError) => {
-  console.log(err);
   const message = `Duplicate field value: ${JSON.stringify(
     err.keyValue
   )}. Please use another value!`;
@@ -50,8 +49,6 @@ const sendErrorProd = (err: AppError, res: Response) => {
 };
 
 const globalErrorHandler = (err: AppError, req: Request, res: Response, next: NextFunction) => {
-  console.log('asdasdassdsd!!!!!!');
-  console.log(err);
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 

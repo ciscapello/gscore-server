@@ -39,7 +39,6 @@ export const buyProduct = catchAsync(async (req: Request, res: Response, next: N
 
 export const getSubscribes = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const userId = req.body.id;
-  console.log(userId);
 
   const subscribes = await Subscribes.aggregate([
     {
@@ -89,7 +88,6 @@ export const changeProduct = catchAsync(async (req: Request, res: Response, next
   );
 
   let codes;
-  console.log(oldSubscribe.sitesCount, product.sitesCount);
   const newCodes = codeGenerator(
     product.sitesCount - oldSubscribe.sitesCount,
     subscribeId,
@@ -98,12 +96,10 @@ export const changeProduct = catchAsync(async (req: Request, res: Response, next
 
   if (!newCodes) {
     await Codes.updateMany({ subscribeId }, { status: 'HOLD' }, { new: true });
-    console.log(codes);
     codes = await Codes.find({ subscribeId: subscribeId });
   } else {
     await Codes.insertMany(newCodes);
     codes = await Codes.find({ subscribeId: subscribeId });
-    console.log(codes);
   }
 
   res.status(200).json({
