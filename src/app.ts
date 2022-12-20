@@ -1,6 +1,7 @@
 import express from 'express';
 import productsRouter from './routes/products.route.js';
 import usersRouter from './routes/users.route.js';
+import subscribesRouter from './routes/subscribes.route.js';
 import morgan from 'morgan';
 import globalErrorHandler from './controllers/error.controller.js';
 import { rateLimit } from 'express-rate-limit';
@@ -46,6 +47,7 @@ app.use(cors(corsOptions));
 
 app.use('/api', productsRouter);
 app.use('/api', usersRouter);
+app.use('/api', subscribesRouter);
 
 app.use(globalErrorHandler);
 

@@ -5,7 +5,6 @@ import bcrypt from 'bcryptjs';
 import AppError from '../utils/appError.js';
 
 export const setPassword = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-  console.log(req.body.id);
   const { currentPassword, newPassword } = req.body;
   const user = await Users.findById(req.body.id).select('+password');
 
