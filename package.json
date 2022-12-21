@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "npx nodemon",
     "build": "rimraf ./dist && npx tsc",
-    "start": "npm run build && node dist/index"
+    "start": "node dist/index"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
