@@ -24,7 +24,7 @@ app.use(mongoSanitize());
 
 app.use(xss());
 
-app.use(express.static('public'));
+app.use(express.static('/'));
 
 app.use(morgan('dev'));
 
