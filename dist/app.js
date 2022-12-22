@@ -18,7 +18,7 @@ helmet({
 app.use(express.json({ limit: '10kb' }));
 app.use(mongoSanitize());
 app.use(xss());
-app.use(express.static('public'));
+app.use(express.static('/'));
 app.use(morgan('dev'));
 const limiter = rateLimit({
     max: 100,
